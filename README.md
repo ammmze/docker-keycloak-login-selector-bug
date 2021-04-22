@@ -1,0 +1,1 @@
+# docker-keycloak-login-selector-bug
