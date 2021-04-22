@@ -1,0 +1,44 @@
+version: '2.4'
+
+services:
+  keycloak:
+    image: jboss/keycloak:12.0.4
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin@123
+      PROXY_ADDRESS_FORWARDING: "true"
+      TZ: UTC
+      KEYCLOAK_LOGLEVEL: INFO
+    ports:
+      - '8680:8080'
+    healthcheck:
+      test: 'curl --fail http://localhost:8080/auth/'
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 1m
+
+  keycloak-config:
+    image: adorsys/keycloak-config-cli:latest
+    depends_on:
+      - keycloak
+    volumes:
+      - ./config.yaml:/config/config.yaml
+    environment:
+      keycloak_url: http://keycloak:8080/auth
+      keycloak_user: admin
+      keycloak_password: admin@123
+      keycloak_client_id: admin-cli
+      keycloak_login_realm: master
+      keycloak_availability_check_enabled: 'true'
+
+  mock-identity-provider:
+    image: quay.io/appvia/mock-oidc-user-server:v0.0.2
+    environment:
+      - PORT=8780
+      - CLIENT_ID=mock-identity-provider
+      - CLIENT_SECRET=mock-identity-provider
+      - CLIENT_REDIRECT_URI=http://localhost:8680/auth/realms/master/broker/mock-identity-provider/endpoint
+      - CLIENT_LOGOUT_REDIRECT_URI=http://localhost:8680
+    ports:
+      - 8780:8780

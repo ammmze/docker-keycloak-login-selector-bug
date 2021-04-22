@@ -1,0 +1,30 @@
+realm: master
+smtpServer:
+  host: smtp-server
+  port: '25'
+  from: keycloak@keycloak.local
+  fromDisplayName: Keycloak
+identityProviders:
+  - alias: mock-identity-provider
+    displayName: Mock Identity Provider
+    providerId: oidc
+    enabled: true
+    updateProfileFirstLoginMode: on
+    trustEmail: false
+    storeToken: false
+    addReadTokenRoleOnCreate: false
+    authenticateByDefault: false
+    linkOnly: false
+    firstBrokerLoginFlowAlias: first broker login
+    config:
+      userInfoUrl: http://mock-identity-provider:8780/me
+      validateSignature: 'true'
+      clientId: mock-identity-provider
+      tokenUrl: http://mock-identity-provider:8780/token
+      authorizationUrl: http://localhost:8780/auth
+      clientAuthMethod: client_secret_basic
+      jwksUrl: http://mock-identity-provider:8780/certs
+      syncMode: IMPORT
+      clientSecret: mock-identity-provider
+      issuer: http://localhost:8780
+      useJwksUrl: 'true'
